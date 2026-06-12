@@ -39,4 +39,6 @@ public class LoginView {
 
   public Button getLogin() {return login;}
   public Button getSignup() {return signup;}
+  public TextField getUsername() {return username;}
+  public TextField getPassword() {return password;}
 }

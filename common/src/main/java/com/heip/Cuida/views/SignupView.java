@@ -17,6 +17,26 @@ public class SignupView {
   private TextField email;
   private TextField phone;
 
+  public TextField getUsername() {
+    return username;
+  }
+
+  public TextField getPassword() {
+    return password;
+  }
+
+  public TextField getConfirmPassword() {
+    return confirmPassword;
+  }
+
+  public TextField getEmail() {
+    return email;
+  }
+
+  public TextField getPhone() {
+    return phone;
+  }
+
   public SignupView() {
     signupForm = new Form("Hãy đăng ký!", BoxLayout.y());
     signupForm.getToolbar().hideToolbar();

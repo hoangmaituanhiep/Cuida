@@ -20,6 +20,13 @@ public class Cuida extends Lifecycle {
     @Override
     public void init(Object context) {
         super.init(context);
+
+        if (CN.isSimulator()) {
+          Log.setLevel(Log.DEBUG);
+        }
+        else {
+          Log.setLevel(Log.REPORTING_NONE);
+        }
         UIManager.initFirstTheme("/theme");
         String language = L10NManager.getInstance().getLanguage();
         Resources global = Resources.getGlobalResources();
