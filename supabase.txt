@@ -1,3 +1,0 @@
-Supabase project's Pass = Tuanhiep1903.
-Publishable key = sb_publishable_mpeHVcNWh9mF-NfNdQlVcA_aluSLs7r
-Project URl = https://jwhkjuukpiiqspvnbyfr.supabase.co
