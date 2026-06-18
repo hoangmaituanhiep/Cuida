@@ -1,4 +1,4 @@
-package com.heip.Cuida.core;
+package com.heip.Cuida.core.user;
 
 public class User {
   private String id;
@@ -7,6 +7,7 @@ public class User {
   private String phone;
   private String birthdate;
   private String avatarUrl;
+  private int battery = -1;
   public void setId(String id) {
     this.id = id;
   }
@@ -34,5 +35,8 @@ public class User {
     this.phone = phone;
     this.birthdate = birthdate;
     this.avatarUrl = avatarUrl;
+  }
+  public User(){
+    //
   }
 }

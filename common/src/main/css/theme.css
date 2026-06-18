@@ -4,8 +4,8 @@ Form {
 }
 
 HeaderLabel {
-    color: #6B705C;
-    font-size: 8mm;
+    color: #DDBEA9; 
+    font-size: 5mm;
     font-weight: bold;
     text-align: center;
     margin-top: 20px;
@@ -54,4 +54,21 @@ Link {
 
 Link.pressed {
     color: #DDBEA9;
+}
+
+HomeForm {
+    background-color: #6B705C; 
+}
+
+VideoRect {
+    background-color: #FFE8D6; 
+    border: 2mm solid white;
+    border-radius: 5mm;
+}
+
+Upload {
+    background-color: #FFE8D6; 
+    border: 1mm solid #DDBEA9; 
+    border-radius: 20mm;       
+    padding: 5mm;
 }

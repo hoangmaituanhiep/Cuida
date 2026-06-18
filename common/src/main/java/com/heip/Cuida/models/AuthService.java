@@ -3,8 +3,8 @@ package com.heip.Cuida.models;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import com.codename1.io.ConnectionRequest;
 import com.codename1.io.JSONParser;
@@ -12,6 +12,10 @@ import com.codename1.io.Log;
 import com.codename1.io.NetworkManager;
 import com.codename1.io.Preferences;
 import com.codename1.ui.CN;
+import com.heip.Cuida.core.APIConfig;
+import com.heip.Cuida.core.user.User;
+import com.heip.Cuida.core.user.UserMapper;
+import com.heip.Cuida.core.user.UserSession;
 
 public class AuthService {
   private String url;
@@ -20,25 +24,12 @@ public class AuthService {
   private final String TOKEN_KEY = "jwt_session_token";
 
   public AuthService() {
-    try (InputStream inp = CN.getResourceAsStream("/config.properties")) {
-      if (inp != null) {
-        Properties properties = new Properties();
-        properties.load(inp);
-
-        this.url = properties.getProperty("project_url");
-        this.key = properties.getProperty("ublishable_key");
-      }
-      else {
-        Log.p("Error cannot find config file.", Log.WARNING);
-      }
-    }
-    catch (IOException e) {
-      Log.e(e);
-    }
+    this.key = APIConfig.getPublishableKey();
+    this.url = APIConfig.getProjectUrl();
   }
 
   public void login(String username, String password, AuthCallback callback) {
-    if (url.isEmpty() && url.equals(null)) {
+    if (url.isEmpty() || url.equals(null)) {
       callback.onFailure("Error: Cannot connect to server via url");
       return;
     }
@@ -76,8 +67,15 @@ public class AuthService {
         Map<String, Object> response = parser.parseJSON(new InputStreamReader(input, "UTF-8"));
 
         String accessToken = (String) response.get("access_token");
-        if (!accessToken.isEmpty() && accessToken.equals(null)) {
+        Map<String, Object> userMap = (Map<String, Object>) response.get("user");
+
+        if (accessToken != null && userMap != null) {
+          String userId = (String) userMap.get("id");
+
           Preferences.set(TOKEN_KEY, accessToken);
+          Preferences.set("current_user_id", userId);
+
+          callback.onSuccess(accessToken);
         }
         else {
           callback.onFailure("Error: Missing session token");
@@ -101,7 +99,50 @@ public class AuthService {
     NetworkManager.getInstance().addToQueue(request);
   }
 
+  public void fecthProfile(String userId, AuthCallback callback) {
+    String link = "https://" + getHost() + "/rest/v1/users?id=eq." + userId;
+
+    ConnectionRequest request = new ConnectionRequest() {
+      @Override
+      public void readResponse(InputStream input) throws IOException {
+        JSONParser parser = new JSONParser();
+
+        Map<String, Object> response = parser.parseJSON(new InputStreamReader(input, "UTF-8"));
+        List<Map<String, Object>> users = (List) response.get("root");
+
+        if (users != null && !users.isEmpty()) {
+          User user = UserMapper.mapToUser(users.get(0));
+          UserSession.setUser(user);
+          callback.onSuccess("Profile Loaded");
+        }
+        else {
+          callback.onFailure("Missing token or userId");
+        }
+      }
+
+      @Override
+      public void handleErrorResponseCode(int code, String message) {
+        callback.onFailure("Server error: " + code + ": " + message);
+      }
+
+      @Override
+      public void handleException(Exception err) {
+        callback.onFailure("Network failure: " + err.getMessage());
+      }
+    };
+
+    request.setUrl(link);
+    request.addRequestHeader("apikey", key);
+    request.addRequestHeader("Authorization", "Bearer " + Preferences.get(TOKEN_KEY, ""));
+    NetworkManager.getInstance().addToQueue(request);
+  }
+
   private String getHost() {
-    return url.substring(url.indexOf("//")+2, url.indexOf("/rest/v1/"));
+    if (url.startsWith("https://")) {
+      return url.substring(8);
+    } else if (url.startsWith("http://")) {
+      return url.substring(7);
+    }
+    return url;
   }
 }

@@ -29,6 +29,14 @@ public class ConnectionController {
     this.signupView = signupView;
   }
 
+  public void setLogin(LoginView loginView) {
+    this.loginView = loginView;
+  }
+
+  public void setSignup(SignupView signupView) {
+    this.signupView = signupView;
+  }
+
   private void initListener() {
     loginView.getLogin().addActionListener(event -> {
       String username = loginView.getUsername().getText().trim();
@@ -58,6 +66,12 @@ public class ConnectionController {
       });
     });
 
+    loginView.getSignup().addActionListener(event -> {
+      SignupView signupView = new SignupView();
+      setSignup(signupView);
+      signupView.show();
+    });
+
     signupView.getSignup().addActionListener(even -> {
       String username = signupView.getUsername().getText().trim();
       String phone = signupView.getPhone().getText().trim();
@@ -83,7 +97,9 @@ public class ConnectionController {
         public void onSuccess(String token) {
           progress.dispose();
 
-          //TODO: Open login Scene
+          LoginView loginView = new LoginView();
+          setLogin(loginView);
+          loginView.show();
         }
         @Override
         public void onFailure(String error) {
@@ -91,6 +107,12 @@ public class ConnectionController {
           Dialog.show("Lỗi đăng ký", error, "Thử lại.", null);
         }
       });
+    });
+
+    signupView.getLogin().addActionListener(event -> {
+      LoginView loginView = new LoginView();
+      setLogin(loginView);
+      loginView.show();
     });
   }
 }
